@@ -1,0 +1,32 @@
+@isTest
+public class Test_VFPageTestClassDemo {
+
+    public static testMethod void testMyController() {
+        PageReference pageRef = Page.VFPageTestClassDemo;
+        Test.setCurrentPage(pageRef);
+      
+        VFPageTestClassDemoController controller = new VFPageTestClassDemoController();
+        String nextPage = controller.save().getUrl();
+
+        // Verify that page fails without parameters
+        System.debug('nextPage fail- ' + nextPage);
+        System.assertEquals('/apex/mj0052__failure?error=noParam', nextPage);
+
+        // Add parameters to page URL
+        ApexPages.currentPage().getParameters().put('qp', 'yyyy');
+      
+        // Instantiate a new controller with all parameters in the page
+        controller = new VFPageTestClassDemoController(); 
+        controller.LastName = 'lastname';
+        controller.FirstName = 'firstname';
+        controller.Company = 'acme';
+        controller.Email = 'firstlast@acme.com';
+        nextPage = controller.save().getUrl();
+
+        // Verify that the success page displays
+        System.debug('nextPage success- ' + nextPage);
+        System.assertEquals('/apex/mj0052__success', nextPage);
+        Lead[] leads = [select id, email from lead where Company = 'acme'];
+        System.assertEquals('firstlast@acme.com', leads[0].email);
+    }
+}
